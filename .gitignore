@@ -1,0 +1,12 @@
+# python  (/data/ 는 루트만 — public/data/ 는 커밋 대상)
+.venv/
+/data/
+.env
+__pycache__/
+*.pyc
+
+# next.js
+node_modules/
+.next/
+out/
+*.tsbuildinfo

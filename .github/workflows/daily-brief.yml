@@ -1,0 +1,73 @@
+# 매일 아침 브리핑 생성 → public/data/briefings.json 갱신 커밋.
+# Cloudflare Pages(또는 Vercel)가 push를 감지해 정적 사이트를 재빌드한다.
+name: Daily Brief
+
+on:
+  schedule:
+    # 월–금 07:00 KST = 일–목 22:00 UTC
+    - cron: '0 22 * * 0-4'
+  workflow_dispatch: # 수동 실행
+
+permissions:
+  contents: write
+
+env:
+  TZ: Asia/Seoul # date.today()가 KST 기준이 되도록
+  POSTGRES_HOST: localhost
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: econ_brief
+  POSTGRES_USER: econ
+  POSTGRES_PASSWORD: econ_ci_pw
+
+jobs:
+  brief:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:16
+        env:
+          POSTGRES_DB: econ_brief
+          POSTGRES_USER: econ
+          POSTGRES_PASSWORD: econ_ci_pw
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U econ -d econ_brief"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install deps
+        run: pip install -r requirements.txt
+
+      - name: Apply schema
+        run: psql "postgresql://econ:econ_ci_pw@localhost:5432/econ_brief" -f db/schema.sql
+
+      - name: Collect + compose (no send)
+        env:
+          ECOS_API_KEY: ${{ secrets.ECOS_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # 장애 알림(선택): TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID 시크릿을 추가하면 활성화
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python -m econ_brief.daily --no-send
+
+      - name: Export archive JSON (merge with existing)
+        run: python -m econ_brief.export
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add public/data/briefings.json
+          git diff --cached --quiet && echo "변경 없음" && exit 0
+          git commit -m "data: $(date +%Y-%m-%d) 브리핑 갱신"
+          git push

@@ -1,0 +1,24 @@
+# econ-brief — 로컬 개발용 Postgres (W1 수집기 적재 대상)
+services:
+  db:
+    image: postgres:16
+    container_name: econ-brief-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-econ_brief}
+      POSTGRES_USER: ${POSTGRES_USER:-econ}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-econ_dev_pw}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - econ_pgdata:/var/lib/postgresql/data
+      # 컨테이너 최초 기동 시 스키마 자동 적용
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-econ} -d ${POSTGRES_DB:-econ_brief}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  econ_pgdata:
