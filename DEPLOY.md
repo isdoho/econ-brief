@@ -25,12 +25,12 @@ gh repo create isdoho/econ-brief --public --source . --push
 등록 후 Actions 탭에서 **Daily Brief** 워크플로우를 `workflow_dispatch`로 한 번 수동 실행해 검증.
 이후 매 평일 07:00 KST에 자동 실행되어 `public/data/briefings.json`을 커밋한다.
 
-## 3. Netlify
+## 3. Cloudflare Pages
 
-1. app.netlify.com → Add new site → Import an existing project → GitHub `econ-brief` 연결
-2. 빌드 설정은 `netlify.toml`이 자동 적용 (command `npm run build` · publish `out`)
+1. dash.cloudflare.com → Workers & Pages → Create → Pages → **Connect to Git** → `isdoho/econ-brief`
+2. 빌드 설정: Build command `npm run build` · Build output directory `out`
 3. 환경변수(빌드):
-   - `NEXT_PUBLIC_SITE_URL` = 배포 도메인 (예: `https://econ-brief.netlify.app` 또는 커스텀 도메인 — netlify.toml에 이미 기본값 있음)
+   - `NEXT_PUBLIC_SITE_URL` = 배포 도메인 (예: `https://econ-brief.pages.dev` 또는 커스텀 도메인)
    - `NEXT_PUBLIC_ADSENSE_CLIENT` = 애드센스 승인 후 `ca-pub-…` (승인 전엔 비워둠)
    - `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` / `NEXT_PUBLIC_NAVER_SITE_VERIFICATION` = 서치콘솔 인증값
 
@@ -40,7 +40,7 @@ gh repo create isdoho/econ-brief --public --source . --push
 - [ ] 개인정보처리방침 `/privacy` ✅ · 사이트 소개/문의 `/about` ✅
 - [ ] sitemap.xml / robots.txt ✅ (빌드에 포함)
 - [ ] 서치콘솔·네이버 서치어드바이저 등록 + sitemap 제출 (배포 후)
-- [ ] 커스텀 도메인 연결 권장 — `*.netlify.app` 서브도메인은 애드센스 등록이 안 될 수 있음
+- [ ] 커스텀 도메인 연결 권장 — `*.pages.dev` 서브도메인은 애드센스 등록이 안 될 수 있음
 - [ ] 2~4주 운영해 아카이브를 더 쌓은 뒤 신청하면 승인 확률↑
 
 ## 참고

@@ -1,5 +1,5 @@
 # 매일 아침 브리핑 생성 → public/data/briefings.json 갱신 커밋.
-# Netlify가 push를 감지해 정적 사이트를 재빌드한다.
+# Cloudflare Pages가 push를 감지해 정적 사이트를 재빌드한다.
 name: Daily Brief
 
 on:
