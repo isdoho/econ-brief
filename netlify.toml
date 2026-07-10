@@ -1,0 +1,8 @@
+# Netlify 빌드 설정 — 대시보드에서 저장소 연결만 하면 이 값이 자동 적용된다.
+[build]
+  command = "npm run build"
+  publish = "out"
+
+[build.environment]
+  # 커스텀 도메인 연결 시 이 값을 도메인으로 교체
+  NEXT_PUBLIC_SITE_URL = "https://econ-brief.netlify.app"

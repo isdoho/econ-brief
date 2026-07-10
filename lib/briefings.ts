@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://econ-brief.pages.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://econ-brief.netlify.app";
 
 export type IndicatorSnapshot = {
   value: number;
