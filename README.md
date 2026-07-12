@@ -84,6 +84,8 @@ GitHub Actions가 매 평일 아침 브리핑을 생성해 JSON을 커밋하고,
 npm install && npm run build                 # → out/
 ```
 
+애널리틱스(선택): 빌드 시 `NEXT_PUBLIC_GA_ID`(GA4 측정 ID) / `NEXT_PUBLIC_CF_BEACON_TOKEN`(Cloudflare Web Analytics 토큰)이 설정된 것만 로드되며, 미설정이면 아무 스크립트도 넣지 않는다.
+
 자동화: [.github/workflows/daily-brief.yml](.github/workflows/daily-brief.yml)
 (Postgres 서비스 컨테이너에서 수집→생성→export→커밋). 배포 절차는 [DEPLOY.md](./DEPLOY.md).
 

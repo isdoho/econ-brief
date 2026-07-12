@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  SITE_URL,
   formatDateKo,
   formatTs,
   getBriefing,
@@ -56,8 +57,50 @@ export default async function BriefingPage({ params }: Props) {
   const older = idx < briefings.length - 1 ? briefings[idx + 1] : null;
   const indicators = Object.entries(b.payload ?? {});
 
+  // 검색엔진용 구조화 데이터 (NewsArticle + 브레드크럼)
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "NewsArticle",
+        headline: `${formatDateKo(b.date)} 경제 브리핑 — 기준금리·환율·물가`,
+        description: snippet(b.body_md, 150),
+        datePublished: b.created_at,
+        dateModified: b.created_at,
+        mainEntityOfPage: `${SITE_URL}/b/${b.date}`,
+        author: {
+          "@type": "Organization",
+          name: "오늘의 경제, 내 말로",
+          url: SITE_URL,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "오늘의 경제, 내 말로",
+          url: SITE_URL,
+        },
+        inLanguage: "ko",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "홈", item: SITE_URL },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: `${b.date} 경제 브리핑`,
+            item: `${SITE_URL}/b/${b.date}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <main className="mx-auto max-w-xl px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <nav className="mb-4 text-xs text-slate-400">
         <Link href="/" className="hover:underline">
           오늘의 경제, 내 말로
