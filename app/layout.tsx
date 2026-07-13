@@ -5,6 +5,9 @@ import "./globals.css";
 
 // 애드센스 승인 후 발급받은 클라이언트 ID를 .env 에 설정 (예: ca-pub-1234567890123456)
 const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+// 애널리틱스 — 설정된 것만 로드 (둘 다 미설정이면 아무것도 로드 안 함)
+const GA_ID = process.env.NEXT_PUBLIC_GA_ID; // GA4 측정 ID (예: G-XXXXXXXXXX)
+const CF_BEACON_TOKEN = process.env.NEXT_PUBLIC_CF_BEACON_TOKEN; // Cloudflare Web Analytics 토큰
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -15,7 +18,10 @@ export const metadata: Metadata = {
   description:
     "기준금리·환율·물가 같은 한국·미국 핵심 경제 지표를 매일 아침, 내 대출이자와 생활비에 무슨 뜻인지 쉬운 말로 풀어주는 경제 브리핑 아카이브.",
   keywords: ["경제 브리핑", "기준금리", "환율", "물가", "CD금리", "국고채", "대출이자", "경제 뉴스 요약"],
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    types: { "application/rss+xml": [{ url: "/rss.xml", title: "오늘의 경제, 내 말로 — RSS" }] },
+  },
   openGraph: {
     type: "website",
     locale: "ko_KR",
@@ -56,8 +62,8 @@ export default function RootLayout({
           </p>
           <p className="mt-2">
             함께 보면 좋은 사이트 —{" "}
-            <a href="https://cheongyak-alimi.vercel.app" className="underline">
-              청약 알리미
+            <a href="https://cheongyak.today" className="underline">
+              오늘청약
             </a>
             {" · "}
             <a href="https://market-cap-board.netlify.app" className="underline">
@@ -70,6 +76,29 @@ export default function RootLayout({
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
             crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
+        {GA_ID && (
+          <>
+            <Script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_ID}');`}
+            </Script>
+          </>
+        )}
+        {CF_BEACON_TOKEN && (
+          <Script
+            defer
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={`{"token": "${CF_BEACON_TOKEN}"}`}
             strategy="afterInteractive"
           />
         )}
