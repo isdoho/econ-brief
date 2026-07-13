@@ -62,8 +62,8 @@ export default function RootLayout({
           </p>
           <p className="mt-2">
             함께 보면 좋은 사이트 —{" "}
-            <a href="https://cheongyak-alimi.vercel.app" className="underline">
-              청약 알리미
+            <a href="https://cheongyak.today" className="underline">
+              오늘청약
             </a>
             {" · "}
             <a href="https://market-cap-board.netlify.app" className="underline">
